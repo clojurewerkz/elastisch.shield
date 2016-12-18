@@ -1,0 +1,12 @@
+pom.xml*
+*jar
+/lib/
+/classes/
+*~
+debug/*
+doc/*
+deploy.docs.sh
+.lein-*
+.nrepl-*
+data/*
+target
