@@ -13,7 +13,7 @@
               [document :as doc]
               [index :as idx]
               [response :refer [acknowledged?]]]
-            [clojurewerkz.elastisch.fixtures      :as fx]
+            [clojurewerkz.elastisch.shield.fixtures      :as fx]
             [clojurewerkz.elastisch.test.helpers  :as th]
             [clojure.test :refer :all]))
 
@@ -25,7 +25,7 @@
        (get-in m [:_shards :successful])
        (get-in m [:_shards :failed])))
 
-(let [conn (th/connect-native-client)]
+(let [conn (fx/connect-native)]
   (deftest ^{:indexing true :native true} test-create-an-index-without-mappings-or-settings
     (let [response (idx/create conn "elastisch-index-without-mappings")]
       (is (acknowledged? response))

@@ -9,17 +9,16 @@
 
 (ns clojurewerkz.elastisch.rest-api.queries.fuzzy-query-test
   (:require [clojurewerkz.elastisch.rest.document :as doc]
-            [clojurewerkz.elastisch.rest :as rest]
             [clojurewerkz.elastisch.rest.index :as idx]
             [clojurewerkz.elastisch.query :as q]
-            [clojurewerkz.elastisch.fixtures :as fx]
+            [clojurewerkz.elastisch.shield.fixtures :as fx]
             [clojurewerkz.elastisch.rest.response :refer :all]
             [clojure.test :refer :all]))
 
 
 (use-fixtures :each fx/reset-indexes fx/prepopulate-articles-index)
 
-(let [conn (rest/connect)]
+(let [conn (fx/connect-rest)]
   (deftest ^{:rest true :query true} test-basic-fuzzy-query-with-string-fields
     (let [index-name   "articles"
           mapping-type "article"

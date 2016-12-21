@@ -8,15 +8,14 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns clojurewerkz.elastisch.rest-api.mappings-test
-  (:require [clojurewerkz.elastisch.rest :as rest]
-            [clojurewerkz.elastisch.rest.index :as idx]
-            [clojurewerkz.elastisch.fixtures :as fx]
+  (:require [clojurewerkz.elastisch.rest.index :as idx]
+            [clojurewerkz.elastisch.shield.fixtures :as fx]
             [clojurewerkz.elastisch.rest.response :refer :all]
             [clojure.test :refer :all]))
 
 (use-fixtures :each fx/reset-indexes)
 
-(let [conn (rest/connect)]
+(let [conn (fx/connect-rest)]
   (deftest ^{:rest true} test-getting-index-mapping
     (let [index    "people1"
           mappings fx/people-mapping

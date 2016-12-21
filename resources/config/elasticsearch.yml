@@ -9,7 +9,7 @@ script.indexed: on
 network:
   bind_host: "0.0.0.0"
 
-action.auto_create_index: .security
+action.auto_create_index: true
 
 shield:
   authc:

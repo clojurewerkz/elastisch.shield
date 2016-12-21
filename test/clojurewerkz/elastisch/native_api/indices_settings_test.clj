@@ -13,13 +13,13 @@
               [document :as doc]
               [index :as idx]
               [response :refer [acknowledged?]]]
-            [clojurewerkz.elastisch.fixtures      :as fx]
+            [clojurewerkz.elastisch.shield.fixtures      :as fx]
             [clojurewerkz.elastisch.test.helpers  :as th]
             [clojure.test :refer :all]))
 
 (use-fixtures :each fx/reset-indexes fx/prepopulate-people-index)
 
-(let [conn (th/connect-native-client)
+(let [conn (fx/connect-native)
       index-name "people"]
   (deftest ^{:indexing true :native true} test-closing-and-opening-existing-index
     (testing "it should close people's index"

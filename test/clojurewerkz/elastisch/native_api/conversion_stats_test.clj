@@ -15,7 +15,7 @@
               [response :refer [acknowledged?]]
               [conversion :as cnv]
               [conversion-stats :as cnv-stats]]
-            [clojurewerkz.elastisch.fixtures      :as fx]
+            [clojurewerkz.elastisch.shield.fixtures      :as fx]
             [clojurewerkz.elastisch.test.helpers  :as th]
             [clojure.test :refer :all]))
 
@@ -24,7 +24,7 @@
                     fx/prepopulate-articles-index
                     fx/prepopulate-tweets-index)
 
-(def es-conn (th/connect-native-client))
+(def es-conn (fx/connect-native))
 
 (defn get-raw-stats
   "returns IndicesStatsResponse class without any conversion"

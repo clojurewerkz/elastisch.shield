@@ -12,14 +12,14 @@
             [clojurewerkz.elastisch.native :as es]
             [clojurewerkz.elastisch.native.multi :as multi]
             [clojurewerkz.elastisch.query :as q]
-            [clojurewerkz.elastisch.fixtures :as fx]
+            [clojurewerkz.elastisch.shield.fixtures :as fx]
             [clojurewerkz.elastisch.test.helpers :as th]
             [clojurewerkz.elastisch.native.response :refer :all]
             [clojure.test :refer :all]))
 
 (use-fixtures :each fx/reset-indexes fx/prepopulate-people-index fx/prepopulate-articles-index fx/prepopulate-tweets-index)
 
-(let [conn (th/connect-native-client)]
+(let [conn (fx/connect-native)]
   (deftest ^{:rest true} test-multi-search
     (let [res1 (doc/search conn "people" "person" {:query (q/match-all) :size 1})
           res2 (doc/search conn "articles" "article" {:query (q/match-all) :size 1})

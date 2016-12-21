@@ -10,9 +10,8 @@
 (ns clojurewerkz.elastisch.rest-api.indexing-test
   (:require [clojurewerkz.elastisch.rest.document :as doc]
             [clojurewerkz.elastisch.rest.index :as idx]
-            [clojurewerkz.elastisch.rest :as rest]
             [clojurewerkz.elastisch.query :as q]
-            [clojurewerkz.elastisch.fixtures :as fx]
+            [clojurewerkz.elastisch.shield.fixtures :as fx]
             [clojurewerkz.elastisch.rest.response :refer [created? acknowledged? conflict? hits-from any-hits? no-hits?]]
             [clojure.test :refer :all]
             [clj-time.core :refer [months ago]]
@@ -23,8 +22,10 @@
 (def ^{:const true} index-name "people")
 (def ^{:const true} index-type "person")
 
-(let [conn (rest/connect)]
-  (deftest ^{:rest true :indexing true} test-put-with-autocreated-index
+(let [conn (fx/connect-rest)]
+  
+  ;;requires that dynamic indexing is activated
+  #_(deftest ^{:rest true :indexing true} test-put-with-autocreated-index
     (let [id         "1"
           document   fx/person-jack
           response   (doc/put conn index-name index-type id document)
@@ -39,10 +40,12 @@
 
   (deftest ^{:rest true :indexing true} test-put-with-precreated-index-without-mapping-types
     (let [id       "1"
-          _        (idx/create conn index-name)
+          idx-res        (idx/create conn index-name)
+          _           (idx/refresh conn)
           document   fx/person-jack
           response   (doc/put conn index-name index-type id document)
           get-result (doc/get conn index-name index-type id)]
+      (is (:acknowledged idx-res)) 
       (is (created? response))
       (are [expected actual] (= expected (actual get-result))
            document   :_source
@@ -52,8 +55,8 @@
 
   (deftest ^{:rest true :indexing true} test-put-with-precreated-index-with-mapping-types
     (let [id       "1"
-          _        (idx/create conn index-name {:mappings fx/people-mapping})
-          document   fx/person-jack
+          idx-res   (idx/create conn index-name {:mappings fx/people-mapping})
+          document  fx/person-jack
           response   (doc/put conn index-name index-type id document)
           get-result (doc/get conn index-name index-type id)]
       (is (created? response))
@@ -65,6 +68,8 @@
 
   (deftest ^{:rest true :indexing true} test-put-with-missing-document-versioning-type
     (let [id       "1"
+          idx-res   (idx/create conn index-name {:mappings fx/people-mapping})
+
           _        (doc/put conn index-name index-type id fx/person-jack)
           _        (doc/put conn index-name index-type id fx/person-mary)
           response (doc/put conn index-name index-type id fx/person-joe {:version 1})]
@@ -72,6 +77,8 @@
 
   (deftest ^{:rest true :indexing true} test-put-with-conflicting-document-version
     (let [id       "1"
+          idx-res   (idx/create conn index-name {:mappings fx/people-mapping})
+
           _        (doc/put conn index-name index-type id fx/person-jack)
           _        (doc/put conn index-name index-type id fx/person-mary)
           response (doc/put conn index-name index-type id fx/person-joe {:version 1 :version_type "external"})]
@@ -80,6 +87,8 @@
 
   (deftest ^{:rest true :indexing true} test-put-with-new-document-version
     (let [id       "1"
+          idx-res   (idx/create conn index-name {:mappings fx/people-mapping})
+
           _        (doc/put conn index-name index-type id fx/person-jack {:version 1 :version_type "external"})
           _        (doc/put conn index-name index-type id fx/person-mary {:version 2 :version_type "external"})
           response (doc/put conn index-name index-type id fx/person-joe  {:version 3 :version_type "external"})]
@@ -88,6 +97,8 @@
 
   (deftest ^{:rest true :indexing true} create-when-already-created-test
     (let [id       "1"
+          idx-res   (idx/create conn index-name {:mappings fx/people-mapping})
+
           _        (doc/put conn index-name index-type id fx/person-jack)
           response (doc/put conn index-name index-type id fx/person-joe {:op_type "create"})]
       (is (conflict? response))))
@@ -123,7 +134,8 @@
       (is (created? response))))
 
   (deftest ^{:rest true :indexing true} test-put-create-autogenerate-id-test
-    (let [response (doc/create conn index-name index-type fx/person-jack)]
+    (let [_        (idx/create conn index-name {:mappings fx/people-mapping})
+          response (doc/create conn index-name index-type fx/person-jack)]
       (is (created? response))
       (is (:_id response))
       (are [expected actual] (= expected (actual response))

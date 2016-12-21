@@ -11,21 +11,20 @@
   (:require [clojurewerkz.elastisch.native.document :as doc]
             [clojurewerkz.elastisch.native.index    :as idx]
             [clojurewerkz.elastisch.query           :as q]
-            [clojurewerkz.elastisch.fixtures        :as fx]
+            [clojurewerkz.elastisch.shield.fixtures        :as fx]
             [clojurewerkz.elastisch.test.helpers    :as th]
             [clojurewerkz.elastisch.native.response :refer :all]
             [clojure.test :refer :all])
   (:import [org.elasticsearch.index.engine VersionConflictEngineException]))
 
-(use-fixtures :each fx/reset-indexes)
+(use-fixtures :each fx/reset-indexes fx/init-people-index)
 
-(let [conn (th/connect-native-client)]
+(let [conn (fx/connect-native)]
   (deftest test-replacing-documents
     (let [index-name "people"
           index-type "person"
           id         "3"
           new-bio    "Such a brilliant person"]
-      (idx/create conn index-name {:mappings fx/people-mapping})
 
       (doc/put conn index-name index-type "1" fx/person-jack)
       (doc/put conn index-name index-type "2" fx/person-mary)
@@ -43,9 +42,7 @@
     (let [index-name "people"
           index-type "person"
           id         "1"]
-      (idx/create conn index-name {:mappings fx/people-mapping})
       (doc/create conn index-name index-type (assoc fx/person-jack :biography "brilliant1") {:id id})
-      (idx/refresh conn index-name)
       (let [original-document (doc/get conn index-name index-type id)
             original-version (:_version original-document)]
         (doc/put conn index-name index-type id (assoc fx/person-jack :biography "brilliant2") {:version original-version})
@@ -58,9 +55,7 @@
     (let [index-name "people"
           index-type "person"
           id         "1"]
-      (idx/create conn index-name {:mappings fx/people-mapping})
       (doc/create conn index-name index-type (assoc fx/person-jack :biography "brilliant1") {:id id})
-      (idx/refresh conn index-name)
       (let [original-document (doc/get conn index-name index-type id)
             original-version (:_version original-document)]
         (doall
@@ -74,9 +69,7 @@
     (let [index-name "people"
           index-type "person"
           id         "1"]
-      (idx/create conn index-name {:mappings fx/people-mapping})
       (doc/create conn index-name index-type (assoc fx/person-jack :biography "brilliant1") {:id id})
-      (idx/refresh conn index-name)
       (let [original-document (doc/get conn index-name index-type id)]
         (doc/update-with-partial-doc conn index-name index-type id {:country "Sweden"})
         (idx/refresh conn index-name)
@@ -105,7 +98,6 @@
     (let [index-name "people"
           index-type "person"
           id "1"]
-      (idx/create conn index-name {:mappings fx/people-mapping})
 
       (doc/create conn index-name index-type fx/person-jack {:id id})
 

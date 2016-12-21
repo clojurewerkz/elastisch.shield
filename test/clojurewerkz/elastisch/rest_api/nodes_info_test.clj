@@ -8,14 +8,13 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns clojurewerkz.elastisch.rest-api.nodes-info-test
-  (:require [clojurewerkz.elastisch.rest :as rest]
-            [clojurewerkz.elastisch.rest.admin :as admin]
-            [clojurewerkz.elastisch.fixtures :as fx]
+  (:require [clojurewerkz.elastisch.rest.admin :as admin]
+            [clojurewerkz.elastisch.shield.fixtures :as fx]
             [clojure.test :refer :all]))
 
 (use-fixtures :each fx/reset-indexes fx/prepopulate-tweets-index)
 
-(let [conn (rest/connect)]
+(let [conn (fx/connect-rest)]
   (deftest ^{:rest true} test-nodes-info
     (testing "basic info"
       (let [info (admin/nodes-info conn)]

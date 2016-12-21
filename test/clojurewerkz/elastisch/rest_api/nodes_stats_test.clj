@@ -9,8 +9,7 @@
 
 (ns clojurewerkz.elastisch.rest-api.nodes-stats-test
   (:require [clojurewerkz.elastisch.rest.admin :as admin]
-            [clojurewerkz.elastisch.rest :as rest]
-            [clojurewerkz.elastisch.fixtures :as fx]
+            [clojurewerkz.elastisch.shield.fixtures :as fx]
             [clojure.test :refer :all]))
 
 (use-fixtures :each fx/reset-indexes fx/prepopulate-tweets-index)
@@ -19,7 +18,7 @@
   [stats node-id stats-group]
   (-> stats :nodes node-id stats-group))
 
-(let [conn (rest/connect)]
+(let [conn (fx/connect-rest)]
   (deftest ^{:rest true} nodes-stats
   (is (= #{:cluster_name :nodes}
          (into #{} (keys (admin/nodes-stats conn)))))

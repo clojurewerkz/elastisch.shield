@@ -9,17 +9,16 @@
 
 (ns clojurewerkz.elastisch.rest-api.queries.mlt-query-test
   (:require [clojurewerkz.elastisch.rest.document :as doc]
-            [clojurewerkz.elastisch.rest :as rest]
             [clojurewerkz.elastisch.rest.index    :as idx]
             [clojurewerkz.elastisch.query    :as q]
-            [clojurewerkz.elastisch.fixtures :as fx]
+            [clojurewerkz.elastisch.shield.fixtures :as fx]
             [clojurewerkz.elastisch.rest.response :refer :all]
             [clojure.test :refer :all]
             [clj-time.core :refer [months ago now from-now]]))
 
 (use-fixtures :each fx/reset-indexes fx/prepopulate-articles-index)
 
-(let [conn (rest/connect)]
+(let [conn (fx/connect-rest)]
   (deftest ^{:query true :rest true} test-more-like-this-query
     (let [index-name   "articles"
           mapping-type "article"

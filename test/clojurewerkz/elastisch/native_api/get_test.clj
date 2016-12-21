@@ -11,17 +11,17 @@
   (:require [clojurewerkz.elastisch.native.document :as doc]
             [clojurewerkz.elastisch.native.index    :as idx]
             [clojurewerkz.elastisch.query           :as q]
-            [clojurewerkz.elastisch.fixtures        :as fx]
+            [clojurewerkz.elastisch.shield.fixtures        :as fx]
             [clojurewerkz.elastisch.test.helpers    :as th]
             [clojurewerkz.elastisch.native.response :refer :all]
             [clojure.test :refer :all]))
 
-(use-fixtures :each fx/reset-indexes)
+(use-fixtures :each fx/reset-indexes fx/init-people-index fx/init-tweets-index)
 
 (def ^{:const true} index-name "people")
 (def ^{:const true} mapping-type "person")
 
-(let [conn (th/connect-native-client)]
+(let [conn (fx/connect-native)]
   (deftest ^{:native true} test-present-with-non-existing-id
     (doc/put conn index-name mapping-type "10" fx/person-jack)
     (is (not (doc/present? conn index-name mapping-type "1"))))
@@ -64,6 +64,8 @@
 
   (deftest ^{:native true} test-get-search-template
    (doc/put-search-template conn "test-template1" fx/test-template1)
+   ;(idx/refresh conn index-name)
+
    (let [{:keys [exists _id empty? index _type source]} (doc/get-search-template conn "test-template1")]
       (is exists)
       (is (= _id "test-template1"))

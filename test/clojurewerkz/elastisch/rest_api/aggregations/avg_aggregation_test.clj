@@ -9,16 +9,16 @@
 
 (ns clojurewerkz.elastisch.rest-api.aggregations.avg-aggregation-test
   (:require [clojurewerkz.elastisch.rest.document :as doc]
-            [clojurewerkz.elastisch.rest :as rest]
+            [clojurewerkz.elastisch.shield :as shield]
             [clojurewerkz.elastisch.query         :as q]
             [clojurewerkz.elastisch.aggregation   :as a]
-            [clojurewerkz.elastisch.fixtures :as fx]
+            [clojurewerkz.elastisch.shield.fixtures :as fx]
             [clojure.test :refer :all]
             [clojurewerkz.elastisch.rest.response :refer :all]))
 
 (use-fixtures :each fx/reset-indexes fx/prepopulate-people-index)
 
-(let [conn (rest/connect)]
+(let [conn (shield/connect-rest (:username fx/es-admin) (:password fx/es-admin))]
   (deftest ^{:rest true :aggregation true} test-avg-aggregation
     (let [index-name   "people"
           mapping-type "person"

@@ -9,24 +9,23 @@
 
 (ns clojurewerkz.elastisch.rest-api.delete-test
   (:require [clojurewerkz.elastisch.rest.document :as doc]
-            [clojurewerkz.elastisch.rest :as rest]
             [clojurewerkz.elastisch.rest.index :as idx]
             [clojurewerkz.elastisch.query :as q]
-            [clojurewerkz.elastisch.fixtures :as fx]
+            [clojurewerkz.elastisch.shield.fixtures :as fx]
             [clojurewerkz.elastisch.rest.response :refer :all]
             [clojure.test :refer :all]))
 
 
-(use-fixtures :each fx/reset-indexes)
+(use-fixtures :each fx/reset-indexes fx/init-people-index)
 
 (def ^{:const true} index-name "people")
 (def ^{:const true} mapping-type "person")
 
 
-(let [conn (rest/connect)]
+(let [conn (fx/connect-rest)]
   (deftest ^{:rest true} test-delete-when-a-document-exists
-    (let [id "1"]
-      (doc/put conn index-name mapping-type id fx/person-jack)
+    (let [id "1"
+          res (doc/put conn index-name mapping-type id fx/person-jack)]
       (is (doc/present? conn index-name mapping-type id))
       (is (found? (doc/delete conn index-name mapping-type id)))
       (is (not (doc/present? conn index-name mapping-type id))))))

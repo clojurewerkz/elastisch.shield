@@ -12,14 +12,14 @@
             [clojurewerkz.elastisch.native          :as es]
             [clojurewerkz.elastisch.native.index    :as idx]
             [clojurewerkz.elastisch.query           :as q]
-            [clojurewerkz.elastisch.fixtures        :as fx]
+            [clojurewerkz.elastisch.shield.fixtures        :as fx]
             [clojurewerkz.elastisch.test.helpers    :as th]
             [clojurewerkz.elastisch.native.response :refer [count-from found?]]
             [clojure.test :refer :all]))
 
-(use-fixtures :each fx/reset-indexes)
+(use-fixtures :each fx/reset-indexes fx/init-people-index)
 
-(let [conn (th/connect-native-client)]
+(let [conn (fx/connect-native)]
   (deftest ^{:native true} test-delete-when-a-document-exists
   (let [id           "1"
         index-name   "people"

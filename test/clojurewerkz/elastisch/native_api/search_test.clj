@@ -12,15 +12,18 @@
             [clojurewerkz.elastisch.native          :as es]
             [clojurewerkz.elastisch.native.index    :as idx]
             [clojurewerkz.elastisch.query           :as q]
-            [clojurewerkz.elastisch.fixtures        :as fx]
+            [clojurewerkz.elastisch.shield.fixtures        :as fx]
             [clojurewerkz.elastisch.test.helpers    :as th]
             [clojurewerkz.elastisch.native.response :refer :all]
             [clojure.test :refer :all])
   (:import java.util.UUID))
 
-(use-fixtures :each fx/reset-indexes fx/prepopulate-people-index fx/prepopulate-articles-index fx/prepopulate-tweets-index)
+(use-fixtures :each fx/reset-indexes
+                    fx/prepopulate-people-index
+                    fx/prepopulate-articles-index
+                    fx/prepopulate-tweets-index)
 
-(let [conn (th/connect-native-client)]
+(let [conn (fx/connect-native)]
   (deftest ^{:native true} test-search-with-multiple-versions-of-a-document-matching-a-query
     (testing "that only one version is stored (versions are just for MVCC, that is, conflict resolution)"
       (let [index-name   "people"
@@ -160,19 +163,19 @@
       (is (= 4 (count hits)))))
 
   (deftest ^{:native true} search-using-template-with-results
-  (doc/create-search-template conn "test-template1" fx/test-template1)
-  (doc/create conn "tweets" "tweet" fx/tweet1)
+    (doc/create-search-template conn "test-template1" fx/test-template1)
+    (doc/create conn "tweets" "tweet" fx/tweet1)
     (let [result (map :source (hits-from (doc/search conn "tweets" "tweet"
-                             {:template {:id "test-template1"}
-                              :params {:username "clojurewerkz"}})))]
-  (is (= 1 (count result)))))
+                               {:template {:id "test-template1"}
+                                :params {:username "clojurewerkz"}})))]
+      (is (= 1 (count result)))))
 
 
 
   (deftest ^{:native true} search-using-template-without-results
-  (doc/create-search-template conn "test-template1" fx/test-template1)
-  (doc/create conn "tweets" "tweet" fx/tweet1)
+    (doc/create-search-template conn "test-template1" fx/test-template1)
+    (doc/create conn "tweets" "tweet" fx/tweet1)
     (let [result (map :source (hits-from (doc/search conn "tweets" "tweet"
-                             {:template {:id "test-template1"}
-                              :params {:username "returns nothing"}})))]
-  (is (empty?  result)))))
+                               {:template {:id "test-template1"}
+                                :params {:username "returns nothing"}})))]
+      (is (empty?  result)))))

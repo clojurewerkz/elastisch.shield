@@ -10,7 +10,7 @@
 
 (ns clojurewerkz.elastisch.shield-test
   (:require [clojurewerkz.elastisch.shield :as shield]
-            [clojurewerkz.elastisch.fixtures :as fx]
+            [clojurewerkz.elastisch.shield.fixtures :as fx]
             [clojure.test :refer :all]))
 
 (use-fixtures :each fx/reset-indexes)

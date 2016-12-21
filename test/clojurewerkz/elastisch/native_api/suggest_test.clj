@@ -1,11 +1,11 @@
 (ns clojurewerkz.elastisch.native-api.suggest-test
   (:require [clojurewerkz.elastisch.native.document :as doc]
             [clojurewerkz.elastisch.native :as es]
-            [clojurewerkz.elastisch.fixtures :as fx]
+            [clojurewerkz.elastisch.shield.fixtures :as fx]
             [clojurewerkz.elastisch.test.helpers :as th]
             [clojure.test :refer :all]))
 
-(let [conn (th/connect-native-client)]
+(let [conn (fx/connect-native)]
   (use-fixtures :each fx/reset-indexes
                       fx/prepopulate-people-suggestion
                       fx/prepopulate-people-category-suggestion

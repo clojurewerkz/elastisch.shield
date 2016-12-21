@@ -10,14 +10,14 @@
 (ns clojurewerkz.elastisch.native-api.queries.type-query-test
   (:require [clojurewerkz.elastisch.native.document :as doc]
             [clojurewerkz.elastisch.query           :as q]
-            [clojurewerkz.elastisch.fixtures        :as fx]
+            [clojurewerkz.elastisch.shield.fixtures        :as fx]
             [clojurewerkz.elastisch.test.helpers    :as th]
             [clojurewerkz.elastisch.native.response :refer :all]
             [clojure.test :refer :all]))
 
 (use-fixtures :each fx/reset-indexes fx/prepopulate-tweets-index)
 
-(let [conn (th/connect-native-client)]
+(let [conn (fx/connect-native)]
   (deftest ^{:query true :native true} test-basic-type-query
     (let [response (doc/search conn "tweets" "tweet"
                                {:query (q/type "tweet")})]

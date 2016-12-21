@@ -1,17 +1,25 @@
 (ns clojurewerkz.elastisch.rest-api.document-test
-  (:require [clojurewerkz.elastisch.rest :as es]
+  (:require [clojurewerkz.elastisch.shield :as shield]
             [clojurewerkz.elastisch.rest.document :as es.document]
+            [clojurewerkz.elastisch.shield.fixtures :as fx]
             clj-http.core
             [clojure.test :refer :all])
   (:import java.io.ByteArrayInputStream
            clojure.lang.ExceptionInfo))
 
 (deftest ^:rest test-http-options-overridability
-  (let [default-conn (es/connect)
-        throwing-conn (es/connect "http://localhost:9200"
-                                  {:throw-exceptions true})
-        no-throwing-conn (es/connect "http://localhost:9200"
-                                     {:throw-exceptions false})
+  (let [default-conn (shield/connect-rest (:username fx/es-admin)
+                                          (:password fx/es-admin))
+        throwing-conn (shield/connect-rest
+                        "http://localhost:9200"
+                        (:username fx/es-admin)
+                        (:password fx/es-admin)              
+                        {:throw-exceptions true})
+        no-throwing-conn (shield/connect-rest
+                           "http://localhost:9200"
+                           (:username fx/es-admin)
+                           (:password fx/es-admin)              
+                           {:throw-exceptions false})
         index "arbitrary_index"
         mapping "arbitrary_mapping"
         id "arbitrary_id"

@@ -12,7 +12,7 @@
             [clojurewerkz.elastisch.native.document    :as doc]
             [clojurewerkz.elastisch.native.index       :as idx]
             [clojurewerkz.elastisch.query              :as q]
-            [clojurewerkz.elastisch.fixtures           :as fx]
+            [clojurewerkz.elastisch.shield.fixtures           :as fx]
             [clojurewerkz.elastisch.native.percolation :as pcl]
             [clojurewerkz.elastisch.test.helpers       :as th]
             [clojure.walk :as wlk]
@@ -23,7 +23,7 @@
 
 (use-fixtures :each fx/reset-indexes )
 
-(let [conn (th/connect-native-client)]
+(let [conn (fx/connect-native)]
   (deftest ^{:native true :percolation true} test-percolation-case-1
   (let [index-name   "articles"
         query-name   "kuku"

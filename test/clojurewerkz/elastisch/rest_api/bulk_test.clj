@@ -12,16 +12,15 @@
   (:require [clojurewerkz.elastisch.rest.document      :as doc]
             [clojurewerkz.elastisch.rest.bulk          :as bulk]
             [clojurewerkz.elastisch.rest.index         :as idx]
-            [clojurewerkz.elastisch.rest               :as rest]
             [clojurewerkz.elastisch.query              :as q]
-            [clojurewerkz.elastisch.fixtures           :as fx]
+            [clojurewerkz.elastisch.shield.fixtures    :as fx]
             [cheshire.core :as json]
             [clj-http.client :as http]
             [clojure.test :refer :all]
             [clojurewerkz.elastisch.rest.response :refer [created? acknowledged? conflict? hits-from any-hits? no-hits?]]
             [clojure.string :refer [join]]))
 
-(use-fixtures :each fx/reset-indexes)
+(use-fixtures :each fx/reset-indexes fx/init-people-index)
 
 (def ^{:const true} index-name "people")
 (def ^{:const true} index-type "person")
@@ -34,7 +33,7 @@
                            (:status m))) xs))
   (is (every? created? xs)))
 
-(let [conn (rest/connect)]
+(let [conn (fx/connect-rest)]
   (deftest ^{:rest true :indexing true} test-bulk-with-index
     (let [document          fx/person-jack
           for-index         (assoc document :_type index-type)
@@ -54,7 +53,9 @@
   (deftest ^{:rest true :indexing true} test-bulk-with-index-and-type
     (let [document          fx/person-jack
           insert-operations (bulk/bulk-index (repeat 10 document))
-          response          (bulk/bulk-with-index-and-type conn index-name index-type insert-operations {:refresh true})
+          response          (bulk/bulk-with-index-and-type conn index-name index-type
+                                                           insert-operations
+                                                           {:refresh true})
           first-id          (-> response :items first :create :_id)
           get-result        (doc/get conn index-name index-type first-id)]
       (are-all-successful (->> response :items (map :create)))
@@ -71,7 +72,9 @@
           response        (bulk/bulk-with-index-and-type conn index-name index-type insert-ops {:refresh true})
           docs            (->> response :items (map :create) )
           initial-count   (:count (doc/count conn index-name index-type))
-          delete-response (bulk/bulk-with-index-and-type conn index-name index-type (bulk/bulk-delete docs) {:refresh true})]
+          delete-response (bulk/bulk-with-index-and-type conn index-name index-type
+                                                         (bulk/bulk-delete docs)
+                                                         {:refresh true})]
       (is (= 10 initial-count))
       (are-all-successful (->> response :items (map :create)))
       (is (= 0 (:count (doc/count conn index-name index-type))))))

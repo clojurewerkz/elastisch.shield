@@ -9,14 +9,14 @@
 
 (ns clojurewerkz.elastisch.native-api.mappings-test
   (:require [clojurewerkz.elastisch.native.index :as idx]
-            [clojurewerkz.elastisch.fixtures     :as fx]
+            [clojurewerkz.elastisch.shield.fixtures     :as fx]
             [clojurewerkz.elastisch.test.helpers :as th]
             [clojurewerkz.elastisch.native.response :as resp]
             [clojure.test :refer :all]))
 
 (use-fixtures :each fx/reset-indexes)
 
-(let [conn (th/connect-native-client)]
+(let [conn (fx/connect-native)]
   (deftest ^{:native true} test-updating-index-mapping
     (let [index    "people1"
           mapping  fx/people-mapping

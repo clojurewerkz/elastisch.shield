@@ -9,11 +9,10 @@
 
 (ns clojurewerkz.elastisch.rest-api.cluster-state-test
   (:require [clojurewerkz.elastisch.rest.admin :as admin]
-            [clojurewerkz.elastisch.rest :as rest]
-            [clojurewerkz.elastisch.fixtures :as fx]
+            [clojurewerkz.elastisch.shield.fixtures :as fx]
             [clojure.test :refer :all]))
 
-(let [conn (rest/connect)]
+(let [conn (fx/connect-rest)]
   (deftest ^{:rest true} cluster-state
     (let [r (admin/cluster-state conn)]
       (is (:cluster_name r)))

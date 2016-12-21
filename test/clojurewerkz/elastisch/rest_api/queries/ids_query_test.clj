@@ -9,16 +9,15 @@
 
 (ns clojurewerkz.elastisch.rest-api.queries.ids-query-test
   (:require [clojurewerkz.elastisch.rest.document :as doc]
-            [clojurewerkz.elastisch.rest :as rest]
             [clojurewerkz.elastisch.query         :as q]
-            [clojurewerkz.elastisch.fixtures :as fx]
+            [clojurewerkz.elastisch.shield.fixtures :as fx]
             [clojure.set :as cs]
             [clojurewerkz.elastisch.rest.response :refer :all]
             [clojure.test :refer :all]))
 
 (use-fixtures :each fx/reset-indexes fx/prepopulate-tweets-index)
 
-(let [conn (rest/connect)]
+(let [conn (fx/connect-rest)]
   (deftest ^{:rest true :query true} test-basic-ids-query
   (let [response (doc/search conn "tweets" "tweet" {:query (q/ids "tweet" ["1" "2" "8ska88"])})]
     (is (any-hits? response))

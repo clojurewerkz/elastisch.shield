@@ -10,18 +10,17 @@
 (ns clojurewerkz.elastisch.rest-api.get-test
   (:require [clojurewerkz.elastisch.rest.document :as doc]
             [clojurewerkz.elastisch.rest.index :as idx]
-            [clojurewerkz.elastisch.rest :as rest]
             [clojurewerkz.elastisch.query         :as q]
-            [clojurewerkz.elastisch.fixtures :as fx]
+            [clojurewerkz.elastisch.shield.fixtures :as fx]
             [clojurewerkz.elastisch.rest.response :refer :all]
             [clojure.test :refer :all]))
 
-(use-fixtures :each fx/reset-indexes)
+(use-fixtures :each fx/reset-indexes fx/init-pages-index fx/init-people-index)
 
 (def ^{:const true} index-name "people")
 (def ^{:const true} mapping-type "person")
 
-(let [conn (rest/connect)]
+(let [conn (fx/connect-rest)]
   (deftest ^{:rest true} test-get-with-non-existing-document
     (is (nil? (doc/get conn "pages" "page" "as8d8as882jk2jk9#d77$%88s7"))))
 
