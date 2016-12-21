@@ -1,0 +1,22 @@
+cluster:
+  name: "shield-test"
+node:
+  name: "shield-test-node-1"
+
+script.inline: on
+script.indexed: on
+
+network:
+  bind_host: "0.0.0.0"
+
+action.auto_create_index: .security
+
+shield:
+  authc:
+    realms:
+      default:
+        type: esusers
+        enabled: true
+        files.users: /usr/share/elasticsearch/config/shield/users
+        files.users_roles: /usr/share/elasticsearch/config/shield/users_roles
+        order: 0
