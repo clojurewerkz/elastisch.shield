@@ -38,12 +38,53 @@ With Maven:
 
 ## Documentation & Examples
 
-Our documentation site is not yet live, sorry.
+```clojure
 
+  (require '[clojurewerkz.elastisch.shield :as shield] :reload)
+
+  (def shield-user (shield/init-user "es_admin" "toor123"))
+  (def test-user (shield/init-user "es_test" "qwerty123" ["test"]))
+
+  ;using rest-client to make authorized calls
+  (def srconn (shield/connect-rest
+                "http://127.0.0.1:9200"
+                (:username shield-user)
+                (:password shield-user)))
+                
+  (require '[clojurewerkz.elastisch.rest.admin :as radmin])
+  (radmin/cluster-health srconn)
+  (shield/info srconn)
+
+  
+  ;; manage Shield license
+  (shield/get-license srconn)
+  (def lic-file (slurp "resources/elastisch-shield-license-v2.json"))
+  (shield/update-license srconn lic-file)
+
+  ;; manage Shield users
+  (shield/authenticate srconn)
+  (shield/clear-cache srconn)
+  (shield/add-user srconn test-user)
+  (shield/get-users srconn)
+  (shield/get-users srconn ["es_test"])
+  (shield/delete-user srconn (:username test-user))
+
+
+  ;;using native client to make authorized calls
+  (def sconn (shield/connect-native  [["127.0.0.1" 9300]]
+                                     (:username shield-user)
+                                     (:password shield-user)
+                                     {"cluster.name" "shield-test"}))
+
+  (require '[clojurewerkz.elastisch.native.index :as index])
+  (index/create sconn "testindex")
+  (index/stats sconn)
+
+```
 
 ## Community & Support
 
-[Elasitsch has a mailing
+[Elastisch has a mailing
 list](https://groups.google.com/forum/#!forum/clojure-elasticsearch). Feel
 free to join it and ask any questions you may have.
 
