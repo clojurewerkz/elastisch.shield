@@ -71,6 +71,10 @@
                 (vec (map #(map->ShieldRoleIndex %) shield-indices))
                 []))
 
+(defn default-url []
+	(or (System/getenv  "ELASTICSEARCH_URL")
+			(System/getenv  "ES_URL")
+			"http://localhost:9200"))
 
 (defn info
   "returns a basic information about the Shield"
@@ -110,11 +114,12 @@
 (defn update-license
   "uploads or re-uploads a the ES license"
   [^Connection rest-conn ^String license-content]
-  (rr-client/post-raw rest-conn
-											(rest-client/url-with-path rest-conn "_license")
-											{:query-params {:acknowledge true}
-											 :content-type :json
-											 :body (str license-content)}))
+  (rest-client/post-string
+    rest-conn
+    (rest-client/url-with-path rest-conn "_license")
+    {:query-params {:acknowledge true}
+     :content-type :json
+     :body (str license-content)}))
 
 
 ;;-- USER endpoints -----------------------------------------------------------
@@ -169,7 +174,7 @@
 
 (defn ^Client connect-rest
   ([^String username ^String password]
-    (connect-rest (rr-client/default-url) username password {}))
+    (connect-rest (default-url) username password {}))
   ([^String uri ^String username ^String password]
     (connect-rest uri username password {}))
   ([^String uri ^String username ^String password ^IPersistentMap opts]
